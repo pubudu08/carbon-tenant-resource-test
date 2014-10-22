@@ -4,7 +4,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>User Realm Sample</title>
+    <title>Resource sample</title>
 </head>
 <body>
 
