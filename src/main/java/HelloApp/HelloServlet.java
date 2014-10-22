@@ -68,9 +68,9 @@ public class HelloServlet extends HttpServlet {
 			if (resourcePath != null && action != null) {
 				if (action.equalsIgnoreCase("get")) {
 					Resource property = registry.get(resourcePath);
-					out.println(" Resource Accessed, Resource name::= " + registry.get
+					out.print(" Resource Accessed, Resource name::= " + registry.get
 					  (resourcePath).getProperty(resourceValue).toString() + " " +
-					            ",property name::=" + property.getId());
+					            ",property name::=" +resourceValue);
 				}
 			}
 		} catch (IOException e) {
