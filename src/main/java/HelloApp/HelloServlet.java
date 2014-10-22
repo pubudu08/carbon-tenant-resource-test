@@ -57,6 +57,7 @@ public class HelloServlet extends HttpServlet {
 			String tenantDomain = request.getParameter("domain");
 
 			out.println("Hello servlet, Tenant Resource test !");
+			PrivilegedCarbonContext.startTenantFlow();
 			PrivilegedCarbonContext cCtx = PrivilegedCarbonContext.getThreadLocalCarbonContext();
 			if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
 				cCtx.setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
@@ -67,16 +68,36 @@ public class HelloServlet extends HttpServlet {
 
 			if (resourcePath != null && action != null) {
 				if (action.equalsIgnoreCase("get")) {
-					Resource property = registry.get(resourcePath);
-					out.print(" Resource Accessed from " + tenantDomain + ",property name::=" +
-					          resourceValue + ", value ::= " + registry.get(resourcePath)
-					  .getProperty(resourceValue));
+					if (registry.resourceExists(resourcePath)) {
+						Resource resource = registry.get(resourcePath);
+						String content = new String((byte[]) resource.getContent());
+						response.addHeader("resource-content", content);
+						out.println("Resource Found in Registry returned!!!");
+						out.println("Registry path :: " + resourcePath);
+						out.println("Registry value :: " + content);
+					} else {
+						out.println("ERROR :: Resource Not Found in Registry!!!");
+						out.println("Registry path :: " + resourcePath);
+					}
+				}else if (action.equalsIgnoreCase("add")) {
+					if( resourceValue != null){
+						Resource resource = registry.newResource();
+						resource.setContent(resourceValue);
+						registry.put(resourcePath, resource);
+						out.println("Resource added successfully!!");
+						out.println("Registry path :: " + resourcePath);
+						out.println("Registry value :: " + resourceValue);
+					}else{
+						out.println("ERROR :: Resource Value Empty!!!");
+					}
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			out.println(e);
 		} catch (RegistryException e) {
-			e.printStackTrace();
+			out.println(e);
+		} finally {
+			PrivilegedCarbonContext.endTenantFlow();
 		}
 	}
 }
